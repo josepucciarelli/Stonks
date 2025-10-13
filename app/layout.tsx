@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Signalist",
+    title: "Stonks",
     description: "Track real-time stock prices, get personalized alerts and explore detailed company insights.",
     icons: {
         icon: '/favicon.ico',
