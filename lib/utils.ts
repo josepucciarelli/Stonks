@@ -78,13 +78,48 @@ export const validateArticle = (article: RawNewsArticle) =>
 // Get today's date string in YYYY-MM-DD format
 export const getTodayString = () => new Date().toISOString().split('T')[0];
 
+// Generate a robust UUID for company news
+const generateUUID = (): string => {
+    const g: any = globalThis as any;
+    if (g?.crypto?.randomUUID && typeof g.crypto.randomUUID === 'function') {
+        return g.crypto.randomUUID();
+    }
+    if (g?.crypto?.getRandomValues && typeof g.crypto.getRandomValues === 'function') {
+        const bytes = new Uint8Array(16);
+        g.crypto.getRandomValues(bytes);
+        // Set version (4) and variant (RFC 4122)
+        bytes[6] = (bytes[6] & 0x0f) | 0x40;
+        bytes[8] = (bytes[8] & 0x3f) | 0x80;
+        const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+        return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+    }
+    // Final fallback: pseudo-random UUIDv4 format
+    const tmpl = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+    return tmpl.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+};
+
+// Deterministic composite ID for market news to avoid duplicates across runs
+const getMarketArticleId = (article: RawNewsArticle, index: number): string => {
+    const parts = [
+        String(article.id ?? ''),
+        String(article.datetime ?? ''),
+        String(article.headline?.trim() ?? ''),
+        String(index ?? 0),
+    ];
+    return parts.join('|');
+};
+
 export const formatArticle = (
     article: RawNewsArticle,
     isCompanyNews: boolean,
     symbol?: string,
     index: number = 0
 ) => ({
-    id: isCompanyNews ? Date.now() + Math.random() : article.id + index,
+    id: isCompanyNews ? generateUUID() : getMarketArticleId(article, index),
     headline: article.headline!.trim(),
     summary:
         article.summary!.trim().substring(0, isCompanyNews ? 200 : 150) + '...',
