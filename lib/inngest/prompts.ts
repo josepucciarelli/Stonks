@@ -228,3 +228,4 @@ EXAMPLES:
 - Barclays PLC (BARC.L) from Finnhub → {"tradingViewSymbol": "LSE:BARC", "confidence": "high", "reasoning": "Barclays trades on London Stock Exchange as BARC"}
 
 Your response must be valid JSON only. Do not include any other text.`
+

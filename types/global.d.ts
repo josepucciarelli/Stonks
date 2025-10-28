@@ -168,13 +168,6 @@ declare global {
         news?: MarketNewsArticle[];
     };
 
-    // Minimal user shapes for newsletter sending and Inngest flows
-    type UserForNewsEmail = {
-        id: string;
-        email: string;
-        name: string;
-    };
-
     type SearchCommandProps = {
         open?: boolean;
         setOpen?: (open: boolean) => void;
